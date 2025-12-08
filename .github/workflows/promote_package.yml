@@ -1,7 +1,5 @@
 name: Promote Python Package
 
-# Triggered automatically via webhook of staging repository after successful upload
-# or manually via workflow_dispatch for specific package version promotion 
 on:
   repository_dispatch:
     types: [cloudsmith_package_uploaded]
@@ -31,7 +29,7 @@ jobs:
       - name: Get package identifier and promote
         run: |
           # Query for the package and get its identifier
-          PACKAGE_QUERY="filename:${PACKAGE_NAME}-${{ github.event.inputs.package_version }}.tar.gz"
+          PACKAGE_QUERY="filename:${PACKAGE_NAME}-${{ github.event.client_payload.package_version }}.tar.gz"
           echo "Searching for package with query: $PACKAGE_QUERY"
           
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
@@ -45,6 +43,11 @@ jobs:
           fi
           
           echo "Found package identifier: $IDENTIFIER"
+
+          # tag the package with ready-for-production tag.
+          cloudsmith tag add --yes \
+            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
+            ready-for-production
           
           # Promote package using the identifier
           cloudsmith mv --yes \
