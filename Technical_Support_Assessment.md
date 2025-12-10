@@ -7,7 +7,7 @@ I've investigated the NPM package upload issue you're experiencing. Based on you
 Here are the likely causes and solutions:
 
 1. **Package Structure**: NPM packages require a valid `package.json` file at the root directory. Please verify the following fields:
-    - **name**: Must be a non-empty string (currently appears empty list)
+    - **name**: Must be a non-empty string (currently appears empty list) e.g., `"example-package"`
     - **main**: Should point to your entry file (e.g., `index.js`)
     - **version**: Must follow semantic versioning format `x.y.z` where x, y, and z are integers (e.g., `2.4.4`)
 
