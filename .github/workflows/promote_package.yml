@@ -56,9 +56,10 @@ jobs:
             echo "Successfully promoted: $IDENTIFIER"
           done
 
-      # - name: Move package to production repository
-      #   run: |
-      #     cloudsmith mv --yes \
-      #       ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
-      #       ${{ env.CLOUDSMITH_PRODUCTION_REPO }}
+      - name: Move package to production repository based on tag
+        run: |
+          cloudsmith mv package \
+            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} \
+            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_PRODUCTION_REPO }} \
+            --tag ${{ env.TAG_NAME }}
         shell: bash
