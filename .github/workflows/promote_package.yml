@@ -11,6 +11,7 @@ env:
   CLOUDSMITH_PRODUCTION_REPO: 'production'
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
   PACKAGE_NAME: 'example_package'
+  TAG_NAME: 'ready-for-production'
 
 permissions:
   id-token: write
@@ -44,9 +45,13 @@ jobs:
 
           echo "Found $COUNT package(s) ready for promotion."
 
-          # Loop through all matched packages
+          # Loop through all found packages and promote them to production with tagging
           for IDENTIFIER in $(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm'); do
             echo "Promoting package: $IDENTIFIER"
+            
+            cloudsmith tag add \
+              ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
+              ${{ env.TAG_NAME }}
 
             cloudsmith mv --yes \
               ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
