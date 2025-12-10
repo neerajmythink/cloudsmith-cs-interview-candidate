@@ -34,24 +34,24 @@ jobs:
           
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
           
-          # Extract the identifier_perm using jq
-          IDENTIFIER=$(echo "$PACKAGE_DATA" | jq -r '.data[0].identifier_perm')
+          # Count matching packages
+          COUNT=$(echo "$PACKAGE_DATA" | jq '.data | length')
           
-          if [ -z "$IDENTIFIER" ] || [ "$IDENTIFIER" = "null" ]; then
-            echo "Failed to find package identifier"
-            exit 1
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No packages found with tag ready-for-production."
+            exit 0
           fi
-          
-          echo "Found package identifier: $IDENTIFIER"
 
-          # tag the package with ready-for-production tag.
-          TAG_NAME="ready-for-production"
-          cloudsmith tag add \
-            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
-            $TAG_NAME
-          
-          # Promote package using the identifier
-          cloudsmith mv --yes \
-            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
-            ${{ env.CLOUDSMITH_PRODUCTION_REPO }}
+          echo "Found $COUNT package(s) ready for promotion."
+
+          # Loop through all matched packages
+          for IDENTIFIER in $(echo "$PACKAGE_DATA" | jq -r '.data[].identifier_perm'); do
+            echo "Promoting package: $IDENTIFIER"
+
+            cloudsmith mv --yes \
+              ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
+              ${{ env.CLOUDSMITH_PRODUCTION_REPO }}
+
+            echo "Successfully promoted: $IDENTIFIER"
+          done
         shell: bash
