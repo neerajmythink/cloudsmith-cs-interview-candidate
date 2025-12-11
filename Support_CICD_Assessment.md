@@ -2,19 +2,7 @@
 
 After cloning the original repository to my GitHub namespace, the following changes were made to enable OIDC authentication and facilitate successful build, release, and promotion of the package.
 
-## Cloudsmith Account Setup
-
-- Created `staging` and `production` repositories under the **interview-neeraj-srivastava** namespace
-- Created a service account to allow `OIDC authentication` from GitHub Actions to Cloudsmith
-- Configured provider settings under **settings** > **Organization** > **OpenID Connect** for GitHub Actions OIDC with the service account
-
-## GitHub Repository Configuration
-
-Under **Secrets and variables** > **Actions** > **Variables**, added the following environment variables to enable OIDC authentication with Cloudsmith:
-- `CLOUDSMITH_NAMESPACE`: interview-neeraj-srivastava
-- `CLOUDSMITH_SERVICE_SLUG`: github-actions-sa-3qx9
-
-## File Changes
+## Changes in repository files
 
 ### 1. pyproject.toml
 - Added `name` and `version` fields under the `[project]` section
@@ -36,3 +24,17 @@ Under **Secrets and variables** > **Actions** > **Variables**, added the followi
 - Added `TAG_NAME` environment variable to specify the tag during promotion
 - Updated `PACKAGE_QUERY` to filter packages by partial package name match
 - Created a loop to iterate over matching packages and promote each by adding the specified tag and moving to production
+
+
+## Cloudsmith Account Setup and Configuration
+
+- Created `staging` and `production` repositories under the **interview-neeraj-srivastava** namespace
+- Created a service account to allow `OIDC authentication` from GitHub Actions to Cloudsmith
+- Configured provider settings under **settings** > **Organization** > **OpenID Connect** for GitHub Actions OIDC with the created service account
+- Created a webhook in **staging** repository to trigger the promotion workflow on `promote-package` event in GitHub Actions whenever a package is pushed to the staging repository.
+
+## GitHub Repository Configuration
+
+- Under **Secrets and variables** > **Actions** > **Variables**, added the following environment variables to enable OIDC authentication with Cloudsmith:
+- `CLOUDSMITH_NAMESPACE`: interview-neeraj-srivastava
+- `CLOUDSMITH_SERVICE_SLUG`: github-actions-sa-3qx9
