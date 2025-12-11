@@ -4,15 +4,15 @@ After cloning the original repository to my GitHub namespace, the following chan
 
 ## Cloudsmith Account Setup
 
-- Created `staging` and `production` repositories under the neerajmythink namespace
+- Created `staging` and `production` repositories under the **interview-neeraj-srivastava** namespace
 - Created a service account to allow `OIDC authentication` from GitHub Actions to Cloudsmith
-- Configured provider settings under **settings** > **Authentication** > **OpenID Connect** for GitHub Actions OIDC with the service account
+- Configured provider settings under **settings** > **Organization** > **OpenID Connect** for GitHub Actions OIDC with the service account
 
 ## GitHub Repository Configuration
 
 Under **Secrets and variables** > **Actions** > **Variables**, added the following environment variables to enable OIDC authentication with Cloudsmith:
-- `CLOUDSMITH_NAMESPACE`: neerajmythink
-- `CLOUDSMITH_SERVICE_SLUG`: github-actions-sa-q5iv
+- `CLOUDSMITH_NAMESPACE`: interview-neeraj-srivastava
+- `CLOUDSMITH_SERVICE_SLUG`: github-actions-sa-3qx9
 
 ## File Changes
 
@@ -24,10 +24,14 @@ Under **Secrets and variables** > **Actions** > **Variables**, added the followi
 
 ### 3. .github/workflows/release_package.yml
 - Added `id-token: write` permission under the **permissions** section
+
+### 4. .github/workflows/release_package.yml
 - Added **Install Cloudsmith CLI** step before **Push package to Cloudsmith** using the cloudsmith-io/cloudsmith-cli-action@v1.0.3 action with necessary OIDC parameters
 
-### 4. .github/workflows/promote_package.yml
+### 5. .github/workflows/promote_package.yml
 - Replaced **workflow_dispatch** trigger with **repository_dispatch** trigger for **promote-package** event
+
+### 6. .github/workflows/promote_package.yml
 - Swapped **staging** and **production** repository names in environment variables
 - Added `TAG_NAME` environment variable to specify the tag during promotion
 - Updated `PACKAGE_QUERY` to filter packages by partial package name match
